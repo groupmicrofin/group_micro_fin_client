@@ -46,7 +46,7 @@ public class SocietyDashBoardServiceImplTest {
 		society.setScheduleFrequency("0 0 20 ? * 1L *");
 
 		SocietyAccount societyAccount = new SocietyAccount();
-		societyAccount.setPendingPrincipalLoanAmount(0);
+		
 		societyAccount.setid(1L);
 		societyAccount.setSocietyMasterID(1L);
 

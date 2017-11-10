@@ -91,7 +91,7 @@ public class MeetingEntryWithInstallmentIntTest {
 		societyAcc.setSocietyMasterID(22L);
 		societyAcc.setSocietyAccountId("13");
 		societyAcc.setMemberName("Medha Patel");
-		societyAcc.setPendingPrincipalLoanAmount(0);
+		//societyAcc.setPendingPrincipalLoanAmount(0);
 		societyAcc.setEmailId("medha@abc");
 		societyAcc.setPhoneNum("9090909090");
 

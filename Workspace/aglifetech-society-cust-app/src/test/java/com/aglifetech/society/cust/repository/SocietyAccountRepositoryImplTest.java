@@ -35,7 +35,7 @@ public class SocietyAccountRepositoryImplTest {
 		societyAccDt.setSocietyMasterID(1L);
 		societyAccDt.setSocietyAccountId("123");
 		societyAccDt.setMemberName("Jay bhavani");
-		societyAccDt.setPendingPrincipalLoanAmount(100);
+		//societyAccDt.setPendingPrincipalLoanAmount(100);
 		societyAccDt.setEmailId("jig@abc.com");
 		societyAccDt.setPhoneNum("9898989898");
 		societyAccDt.setPhotoId("Abc123");
