@@ -1,0 +1,123 @@
++++++++++++++++++++++++++++++
+Customer Society Application
++++++++++++++++++++++++++++++
+
+1. Customer will be able to enter and track his monthly society details.
+2. Customer will be able to get reminder of society dates.
+3. Customer will be able to generate report for seeing his status on society payments.
+
+#################
+Functionalities
+#################
+
+1. Society Information Entry (usually one time activity, and maintaine customer society first time information)
+	
+	SocietyAccount
+	
+	private int societyId;//system generated
+	private int societyAccountId;//Can be supported as user input/system generated (Optional field)
+	private String memberName;
+	private String societyName;
+	private Date societyStartDate;
+	private double shareAmount;// Enter Share amount (Per month fixed defined amount):
+	private double intrestRate; // Interest rate per year:
+	private double pendingPrincipleLoanAmount;	
+	private MeetingFrequency meetingFrequncy;//default MONTHLY system generated
+	private MonthlyDayDeriveLogic monthlyDayDeriveLogic; //How your meeting scheduled done ? 
+							//(Enter 1 if you having date Based (e.x. Every 1st of the month, or Every 7th day of month)
+							//(Enter 2 if you having day based (e.x. First Sunday of the month, Or Last Sunday of the meeting)
+	private int dateBased; //For Month End 99, 1 to 28
+	private DayOfWeek dayBasedDayOfWeek; //1 to 7, 
+	private int dayBasedFirstOrLast; //1 to 2
+	private String emailId;
+	
+	Date based choice
+		Option 1: Month End Date
+					LocalDate initial = LocalDate.now();
+					LocalDate meetingDate = initial.withDayOfMonth(initial.lengthOfMonth());
+		Option 2: Every * day of month (<=28)
+					int userChoiceDayOfMonth = 5;
+					LocalDate currentDate = LocalDate.now();
+					LocalDate initial1 = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), userChoiceDayOfMonth);
+	Day based choice
+		Day(1 to 7..Mon to Sun) of the week(Last or First)
+			initial = LocalDate.now();
+			LocalDate firstSundayOfWeek = initial.with(TemporalAdjusters.dayOfWeekInMonth(1, DayOfWeek.MONDAY));
+			LocalDate lastSundayOfMonth = LocalDate
+					.now()
+					.with(TemporalAdjusters.lastDayOfMonth())
+					.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+			System.out.println("End Date of the month2:" + firstSundayOfWeek);
+			System.out.println("End Date of the month2:" + lastSundayOfMonth);
+	
+	public enum MonthlyDayDeriveLogic
+					DateBased(1), DayBased(2)
+
+					
+	Main Class...
+	Service Class..
+					
+2. Payment Meeting Entry
+
+	MeetingEntry
+	
+	private int societyAccountId;
+	private double loanDisbursedAmount;	
+	private double paidAmount;
+	private LocalDate meetingDate;
+
+	Main Class...
+	
+3. Society Report
+
+	Report Details....
+	Input > societyAccountId
+	Output >
+		totalNoOfMeetings//
+		societyAccountId
+		totalShareAmount
+		totalLoanAmount
+		loanInterestPaidAmount
+		pendingPrincipleLoanAmount
+		nextMeetingDate
+		nextMinimumInstallmentAmount
+Deliverables:
+	
+4. Reminder
+
+	ReminderDetail
+		societyAccountId
+		reminderDate//system generated
+		reminderTime//system generated
+		
+		
+		
+		
+--03/sep/17
+1. Data dictionary update in excel
+2. DDL SQL backup in folder
+3. Unit Testing
+
+4. Service class implemtation
+	SocietyService
+		addSociety
+		updateSociety
+	SocietyAccountService
+		addSocietyAccount
+	MeetingService
+		addMeeting
+		getNextMeetingDate(SocietyId)//Logic
+	ReportService
+		getReport(SocietyAccount)
+	LoanService
+		
+5. Integration Testing
+	User Flow...
+		1. Add Society, Add Account, Add Meeting[without loan], Check Report
+		2. Add Meeting[without loan] , Check Report, Check Alarm
+		3. Add Meeting [with loan] , Check Report, Check Alarm
+		4. Add Meeting [Install Payment], check report, check alam
+		
+		
+	
+		

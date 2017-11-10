@@ -1,0 +1,16 @@
+1) Society Report
+     Questions ...
+			1.How to Find Date Diffrence between meeting Date And Society Account Date.?/
+						(It is require for total ShareAmount)
+				Answer:-
+
+
+				
+			2.How to Find total number of meeting..??/
+			   
+			   Answer:-
+			   
+			
+			3.How to give next Meeting Based on Schedule date Patteren////??????????
+			
+				Answer:-
