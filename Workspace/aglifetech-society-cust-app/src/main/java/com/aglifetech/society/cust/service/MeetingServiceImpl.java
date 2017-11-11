@@ -1,5 +1,6 @@
 package com.aglifetech.society.cust.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.aglifetech.society.cust.model.LoanEntryBook;
@@ -54,7 +55,7 @@ public class MeetingServiceImpl implements MeetingEntryService {
 		SocietyAccount socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
 		Society soc = socAcService.getSocietyByAccountId(meetingEntry.getSocietyMasterId(),
 		        meetingEntry.getSocietyAccountMasterId());
-		
+		meetingEntryValidator.validationAllData(meetingEntry, soc.getShareAmount());
 		meetingEntryValidator.validateMeeting(meetingEntry, socAc);
 		
 		double shareAmt = soc.getShareAmount();
@@ -91,6 +92,7 @@ public class MeetingServiceImpl implements MeetingEntryService {
 	@Override
 	public void deleteLastMeeting(MeetingEntry meetingEntry) {
 		SocietyAccount socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
+		meetingEntryValidator.validateLastMeeting(meetingEntry, socAc);
 		List<LoanEntryBook> loanEntryDtl = loanEntryRepo.findLoanEntryDetailsByMeetingDate(
 		        meetingEntry.getSocietyAccountMasterId(), socAc.getLastMeetingDate());
 		
@@ -121,11 +123,13 @@ public class MeetingServiceImpl implements MeetingEntryService {
 				loanmasterRpo.updateDetail(loanMaster);
 				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
 			} else if (txnCode.equals("LN_DISBUS")) {
-				
+				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
+				loanmasterRpo.deleteLoanMasterDtl(loanMaster);
 			}
 			meetingEntryRepo.deleteMeeting(meetingEntry);
 		}
-		
+		 LocalDate LastMeetingDate = meetingEntryRepo.findLastMeetingDate(socAc.getid());
+		 socAcService.updateMeetingDate(socAc,LastMeetingDate);
 	}
 	
 }

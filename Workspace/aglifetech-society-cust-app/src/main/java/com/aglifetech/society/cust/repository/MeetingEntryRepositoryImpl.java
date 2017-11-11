@@ -1,10 +1,13 @@
 package com.aglifetech.society.cust.repository;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
+import com.aglifetech.society.cust.model.LoanMaster;
 import com.aglifetech.society.cust.model.MeetingEntry;
 
 public class MeetingEntryRepositoryImpl implements MeetingEntryRepository {
@@ -88,7 +91,7 @@ public class MeetingEntryRepositoryImpl implements MeetingEntryRepository {
 			// Step- 3 create Database Statement
 			pStatement = conn.prepareStatement(sql);
 			
-			pStatement.setLong(1, meetingEntry.getid());
+			pStatement.setLong(1, meetingEntry.getSocietyAccountMasterId());
 			pStatement.setDate(2, java.sql.Date.valueOf(meetingEntry.getMeetingDate()));
 			
 			result = pStatement.execute();
@@ -129,5 +132,64 @@ public class MeetingEntryRepositoryImpl implements MeetingEntryRepository {
 		
 		return rowsInserted;
 	}
-	
+
+	@Override
+	public LocalDate findLastMeetingDate(Long accountMaterId) {
+		Connection conn = null;
+		PreparedStatement pStatement = null;
+		ResultSet resultSet = null;
+		LocalDate lastMeetDate=null;
+		try {
+			
+			conn = MyConnectionManager.getConnection();
+			
+			String sql = "SELECT MAX(meeting_dt) FROM societyclient.meeting_nobook WHERE account_master_id=?";
+			
+			pStatement = conn.prepareStatement(sql);
+			
+			pStatement.setLong(1, accountMaterId);
+			resultSet = pStatement.executeQuery();
+			
+			while (resultSet.next()) {
+			
+				Date lastMeetingDate = resultSet.getDate(1);
+				lastMeetDate = lastMeetingDate.toLocalDate();
+				
+				
+			}
+			
+			conn.commit();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (resultSet != null) {
+				try {
+					resultSet.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (pStatement != null) {
+				try {
+					pStatement.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		return lastMeetDate;
+}
 }

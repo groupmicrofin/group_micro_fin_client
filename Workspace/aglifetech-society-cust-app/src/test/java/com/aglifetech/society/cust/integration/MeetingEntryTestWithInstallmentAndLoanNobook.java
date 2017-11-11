@@ -83,7 +83,7 @@ public class MeetingEntryTestWithInstallmentAndLoanNobook {
 		assertTrue(loanMaster.getLoanDisbusmentAmount() == 1000 || loanMaster.getPendingPrincipleLoan() == 1000
 		        || loanMaster.getTotalIntrestPaid() == 0 || loanMaster.getAccountStatus() == 1);
 		// Report service.. get report... value assert int loan installment... //
-		// loanservice.findLoan ... getLoan install_paid int_paid ==0
+		// loanservice.f	indLoan ... getLoan install_paid int_paid ==0
 		
 		// Validate 3.3 Report 
 		SocietyAccountReport socAcReport = socDashService.getDashBoard(socAc.getid());

@@ -11,21 +11,23 @@ import com.aglifetech.society.cust.repository.SocietyAccountRepositoryImpl;
 import com.aglifetech.society.cust.repository.SocietyRepository;
 import com.aglifetech.society.cust.repository.SocietyRepositoryImpl;
 import com.aglifetech.society.cust.util.MeetingDateUtil;
+import com.aglifetech.society.cust.validation.SocietyAccountValidator;
 
 public class SocietyAccountServiceImpl implements SocietyAccountService {
 	
 	SocietyAccountRepository socAcRepo;
 	SocietyRepository socRepo;
+	SocietyAccountValidator socAcValidator;
 	
 	public SocietyAccountServiceImpl() {
 		socAcRepo = new SocietyAccountRepositoryImpl();
 		socRepo = new SocietyRepositoryImpl();
-		
+		socAcValidator= new SocietyAccountValidator();
 	}
 	
 	@Override
 	public void addSocietyAccount(SocietyAccount societyAc) {
-		
+		socAcValidator.validatesocietyAccountData(societyAc);
 		societyAc.setUser("SYSTEM");
 		socAcRepo.addSociety(societyAc);
 		

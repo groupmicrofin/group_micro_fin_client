@@ -99,15 +99,15 @@ public class MeetingEntryTestWithDeleteInstallment {
 		socAcReport = socDashService.getDashBoard(socAc.getid());
 		System.out.println(socAcReport.toString());
 		meetingService.deleteLastMeeting(meetingEntry);
-		/*// 3.7 
+		// 3.7 
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
 		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 2000, 400,
 		        socAc.getLastMeetingDate().plusDays(27));
 		meetingService.addMeeting(meetingEntry); // Validate 3.7 Report socAcReport =
 		socDashService.getDashBoard(socAc.getid());
 		System.out.println(socAcReport.toString());
-		
-		// 3.9 
+		meetingService.deleteLastMeeting(meetingEntry);
+	/*	// 3.9 
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
 		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 0, 800,
 		        socAc.getLastMeetingDate().plusDays(27));

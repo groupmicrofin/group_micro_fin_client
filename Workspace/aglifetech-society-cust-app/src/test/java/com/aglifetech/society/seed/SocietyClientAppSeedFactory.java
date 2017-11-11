@@ -20,7 +20,7 @@ public class SocietyClientAppSeedFactory {
 		sc.setSocietyStartDate(localDate);
 		sc.setShareAmount(100);
 		sc.setIntrestRate(12);
-		sc.setScheduleFrequency("0 0 0 L * ? *");
+		sc.setScheduleFrequency("0 0 0 ? * 0L *");
 		return sc;
 	}
 
@@ -33,7 +33,7 @@ public class SocietyClientAppSeedFactory {
 		societyAcc.setMemberName("Medha Patel");
 		// societyAcc.setPendingPrincipalLoanAmount(1000);
 		societyAcc.setEmailId("medha@abc");
-		societyAcc.setPhoneNum("9090909090");
+		societyAcc.setPhoneNum("90909090");
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 		String date = "30/09/2017";
 		LocalDate localDate = LocalDate.parse(date, formatter);

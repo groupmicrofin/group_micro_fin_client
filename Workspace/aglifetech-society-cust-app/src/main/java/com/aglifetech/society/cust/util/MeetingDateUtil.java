@@ -15,6 +15,7 @@ public class MeetingDateUtil {
 		String cronValues[] = cronSchedExpression.split(" ");
 
 		String cronStrDay = cronValues[3];
+		String cronStr = cronValues[5];
 		int cronStrLen = cronStrDay.length();
 		LocalDate nextMeetingDate = null;
 
@@ -22,16 +23,18 @@ public class MeetingDateUtil {
 			if (cronStrLen == 1) {
 				nextMeetingDate = lastMeetingDate.with(TemporalAdjusters.firstDayOfNextMonth())
 						.with(TemporalAdjusters.lastDayOfMonth());
-			} else {
-				int day = Integer.parseInt(cronStrDay.substring(0, 1));
-				DayOfWeek dayOfWeek = getDayOfWeek(day);
-				LocalDate nextMonthDate = lastMeetingDate.plusMonths(1);
-				nextMeetingDate = nextMonthDate.with(TemporalAdjusters.lastDayOfMonth())
-						.with(TemporalAdjusters.previous(dayOfWeek));
-
-			}
+			} 
 			
-		} else if (cronStrDay.indexOf("F") > 0) {
+		} 
+		else if (cronStr.indexOf("L")>=0 ) {
+			int day = Integer.parseInt(cronStr.substring(0, 1));
+			DayOfWeek dayOfWeek = getDayOfWeek(day);
+			LocalDate nextMonthDate = lastMeetingDate.plusMonths(1);
+			nextMeetingDate = nextMonthDate.with(TemporalAdjusters.lastDayOfMonth())
+					.with(TemporalAdjusters.previous(dayOfWeek));
+		
+		
+		}else if (cronStrDay.indexOf("F") > 0) {
 			int day = Integer.parseInt(cronStrDay.substring(0, 1));
 			DayOfWeek dayOfWeek = getDayOfWeek(day);
 			LocalDate nextMonthDate = lastMeetingDate.plusMonths(1);
@@ -39,7 +42,8 @@ public class MeetingDateUtil {
 					.with(TemporalAdjusters.next(dayOfWeek));
 
 			
-		} else {
+		} 
+		else   {
 			int userChoiceDayOfMonth = Integer.parseInt(cronStrDay);
 			LocalDate initial1 = LocalDate.of(lastMeetingDate.getYear(), lastMeetingDate.getMonth(),
 					userChoiceDayOfMonth);

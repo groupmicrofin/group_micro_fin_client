@@ -42,5 +42,31 @@ public class MeetingEntryValidator {
 			        + expectedMonthOfMeeting + "-" + expectedYearOfMeeting);
 		}
 	}
-	
+	public void validateLastMeeting(MeetingEntry meetingEntry, SocietyAccount societyAccount) {
+		LocalDate lastMeetingDateFromMeeting = meetingEntry.getMeetingDate();
+		LocalDate lastMeetingDateFromSocAc = societyAccount.getLastMeetingDate();
+		if (lastMeetingDateFromMeeting != lastMeetingDateFromSocAc) {
+			throw new RuntimeException("This is not Last Meeting ,Delete All Meeting which are attended after this Meeting And then This Meeetting Should able to delete");
+		
+	}
+	}
+	public void validationAllData(MeetingEntry meetingEntry , double shareAmt) {
+		Long accountMasterId = meetingEntry.getSocietyAccountMasterId();
+			if (accountMasterId == null) {
+				throw new RuntimeException("Account Master Id is Mandatory Field.");
+			}
+		Long societyMasterId = meetingEntry.getSocietyMasterId();
+		if (societyMasterId == null) {
+			throw new RuntimeException("Society Master Id is Mandatory Field.");
+		}
+		double totalPaid = meetingEntry.getTotalPaidAmount();
+			if (totalPaid < shareAmt) {
+			throw new RuntimeException("You can not pay below Share Amount");
+		}
+		LocalDate meetingDate = meetingEntry.getMeetingDate();
+		
+		if (meetingDate == null) {
+		throw new RuntimeException("You can not pay below Share Amount");
+	}
+	}
 }

@@ -3,18 +3,21 @@ package com.aglifetech.society.cust.service;
 import com.aglifetech.society.cust.model.Society;
 import com.aglifetech.society.cust.repository.SocietyRepository;
 import com.aglifetech.society.cust.repository.SocietyRepositoryImpl;
+import com.aglifetech.society.cust.validation.SocietyValidator;
 
 public class SocietyServiceImpl implements SocietyService {
 
 	SocietyRepository societyRepository;
+	SocietyValidator socValiDate;
 
 	public SocietyServiceImpl() {
 		societyRepository = new SocietyRepositoryImpl();
+		socValiDate = new SocietyValidator();
 	}
 
 	@Override
 	public void addSociety(Society society) {
-
+		socValiDate.validateSocietyData(society);
 		/*
 		 * LocalDate lastMeetingDate = society.getLastMeetingDate(); LocalDate nextMeet
 		 * = MeetingDateUtil.getNextMeetingDate(lastMeetingDate,
