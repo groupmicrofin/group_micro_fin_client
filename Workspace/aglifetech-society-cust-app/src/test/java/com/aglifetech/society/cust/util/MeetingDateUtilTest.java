@@ -1,7 +1,5 @@
 package com.aglifetech.society.cust.util;
 
-import static org.junit.Assert.*;
-
 import java.time.LocalDate;
 
 import org.junit.Before;
@@ -15,14 +13,14 @@ public class MeetingDateUtilTest {
 
 	@Test
 	public void testGetNextMeetingDate() {
-		
+
 		LocalDate currDate = LocalDate.now();
-		String cronString = "0 0 0 0F * ? *";
-		
+		String cronString = "0 0 0 ? * 0L";
+
 		LocalDate nextDate;
 		nextDate = MeetingDateUtil.getNextMeetingDate(currDate, cronString);
-		
-		//assertTrue(nextDate.equals(currDate.plusMonths(1L)));
+
+		// assertTrue(nextDate.equals(currDate.plusMonths(1L)));
 	}
 
 }

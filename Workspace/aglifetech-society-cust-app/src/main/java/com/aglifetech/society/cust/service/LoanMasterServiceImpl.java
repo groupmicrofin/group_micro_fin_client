@@ -3,6 +3,7 @@ package com.aglifetech.society.cust.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.aglifetech.society.common.TxnCode;
 import com.aglifetech.society.cust.model.LoanMaster;
 import com.aglifetech.society.cust.model.Society;
 import com.aglifetech.society.cust.model.SocietyAccount;
@@ -78,7 +79,7 @@ public class LoanMasterServiceImpl implements LoanMasterService {
 					loanMaster.setPendingPrincipleLoan(postInstallPendingLoanAmount);
 					loanInstallPaid = remainingInstallmentAmt;
 					remainingInstallmentAmt = 0.0;
-					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), loanInstallPaid, "INST_PAID",
+					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), loanInstallPaid, TxnCode.INST_PAID,
 							meetingDate);
 				} else if (postInstallPendingLoanAmount <= 0.0) { // In case of pending loan amount and installpaid
 																	// amount same, (loan close)
@@ -87,9 +88,10 @@ public class LoanMasterServiceImpl implements LoanMasterService {
 					loanMaster.setPendingPrincipleLoan(0.0);
 					remainingInstallmentAmt = remainingInstallmentAmt - pendingLoanAmount;// Next loan installment
 					loanInstallPaid = pendingLoanAmount; // available amount
-					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), loanInstallPaid, "INST_PAID",
+					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), loanInstallPaid, TxnCode.INST_PAID,
 							meetingDate);
-					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), 0.0, "LN_CLOSED", meetingDate);
+					loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), 0.0, TxnCode.LN_CLOSED,
+							meetingDate);
 				}
 				loanMasterRepo.updateDetail(loanMaster);
 				// To find how much loan install paid for particular loan
@@ -117,7 +119,8 @@ public class LoanMasterServiceImpl implements LoanMasterService {
 			loanMaster.setTotalIntrestPaid(loanMaster.getTotalIntrestPaid() + calculatedInt);
 			// update loan master with charged interest details
 			updateLoanMasterDetail(loanMaster);
-			loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), calculatedInt, "INT_CHRG", meetingDate);
+			loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), calculatedInt, TxnCode.INT_CHRG,
+					meetingDate);
 
 			// TODO call loan repository loan entry method, calculatedInt - INT_CHRG -
 			// Meeting Date

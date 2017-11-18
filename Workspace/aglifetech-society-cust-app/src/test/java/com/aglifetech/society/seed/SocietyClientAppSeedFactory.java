@@ -33,12 +33,12 @@ public class SocietyClientAppSeedFactory {
 		societyAcc.setMemberName("Medha Patel");
 		// societyAcc.setPendingPrincipalLoanAmount(1000);
 		societyAcc.setEmailId("medha@abc");
-		societyAcc.setPhoneNum("90909090");
+		societyAcc.setPhoneNum("9090909030");
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 		String date = "30/09/2017";
 		LocalDate localDate = LocalDate.parse(date, formatter);
 
-		// societyAcc.setLastMeetingDate(localDate);
+		societyAcc.setLastMeetingDate(localDate);
 		societyAcc.setPhotoId("aadhar");
 
 		return societyAcc;

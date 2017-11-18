@@ -37,7 +37,7 @@ public class MeetingEntryTestWithInstallmentAndLoanNobook {
 	private MeetingEntryService meetingService;
 	private LoanMasterRepository loanRepo;
 	private SocietyDashBoardService socDashService;
-	
+
 	@Before
 	public void setUp() {
 		socRepo = new SocietyRepositoryImpl();
@@ -48,7 +48,7 @@ public class MeetingEntryTestWithInstallmentAndLoanNobook {
 		loanRepo = new LoanMasterRepositoryImpl();
 		socDashService = new SocietyDashBoardServiceImpl();
 	}
-	
+
 	@Test
 	public void meetingEntryWithInstallmentAndLoanNobookTest() {
 		// 3.1
@@ -58,65 +58,65 @@ public class MeetingEntryTestWithInstallmentAndLoanNobook {
 		Society soc = socRepo.findSocietyById(society.getId());
 		// findSocietyById society, getDate == , getShareAmount = 100
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("d/MM/yyyy");
-		
+
 		// AssertTest
 		assertTrue(soc.getShareAmount() == 100);
 		assertTrue(soc.getIntrestRate() == 12);
 		assertTrue(soc.getSocietyStartDate().equals(LocalDate.parse("26/01/2017", format)));
 		assertTrue(soc.getSocietyRefId().equals("33"));
-		
+
 		// 3.2
 		SocietyAccount socAc = SocietyClientAppSeedFactory.getSocietyAccountDummy(society.getId(), 5L);
 		socAcService.addSocietyAccount(socAc);
-		
+
 		// Validate 3.2
 		SocietyAccount socAccount = socAcRepo.findSocietyAccountById(socAc.getid());
 		assertTrue(socAccount.getSocietyMasterID().equals(soc.getId()));
 		assertTrue(socAccount.isFirstMeeting());
-		
-		// 3.3 
+
+		// 3.3
 		MeetingEntry meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 1000,
-		        100, LocalDate.of(2017, 10, 31));
+				100, LocalDate.of(2017, 10, 31));
 		meetingService.addMeeting(meetingEntry);
-		// Validate 3.3 
+		// Validate 3.3
 		LoanMaster loanMaster = loanRepo.findLoanDetailByAccountId(socAccount.getid());
 		assertTrue(loanMaster.getLoanDisbusmentAmount() == 1000 || loanMaster.getPendingPrincipleLoan() == 1000
-		        || loanMaster.getTotalIntrestPaid() == 0 || loanMaster.getAccountStatus() == 1);
+				|| loanMaster.getTotalIntrestPaid() == 0 || loanMaster.getAccountStatus() == 1);
 		// Report service.. get report... value assert int loan installment... //
-		// loanservice.f	indLoan ... getLoan install_paid int_paid ==0
-		
-		// Validate 3.3 Report 
+		// loanservice.f indLoan ... getLoan install_paid int_paid ==0
+
+		// Validate 3.3 Report
 		SocietyAccountReport socAcReport = socDashService.getDashBoard(socAc.getid());
 		System.out.println(socAcReport.toString());
-		
-		// 3.5 
+
+		// 3.5
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
 		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 0, 400,
-		        socAc.getLastMeetingDate().plusDays(27));
+				socAc.getLastMeetingDate().plusDays(27));
 		meetingService.addMeeting(meetingEntry);
-		
-		// Validate 3.5 Report 
+
+		// Validate 3.5 Report
 		socAcReport = socDashService.getDashBoard(socAc.getid());
 		System.out.println(socAcReport.toString());
-		
-		// 3.7 
+
+		// 3.7
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
 		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 2000, 400,
-		        socAc.getLastMeetingDate().plusDays(27));
+				socAc.getLastMeetingDate().plusDays(27));
 		meetingService.addMeeting(meetingEntry); // Validate 3.7 Report socAcReport =
-		socDashService.getDashBoard(socAc.getid());
-		System.out.println(socAcReport.toString());
-		
-		// 3.9 
-		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
-		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 0, 800,
-		        socAc.getLastMeetingDate().plusDays(27));
-		meetingService.addMeeting(meetingEntry);
-		
-		// Validate 3.9 Report 
 		socAcReport = socDashService.getDashBoard(socAc.getid());
 		System.out.println(socAcReport.toString());
-		
+
+		// 3.9
+		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
+		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 0, 800,
+				socAc.getLastMeetingDate().plusDays(27));
+		meetingService.addMeeting(meetingEntry);
+
+		// Validate 3.9 Report
+		socAcReport = socDashService.getDashBoard(socAc.getid());
+		System.out.println(socAcReport.toString());
+
 	}
-	
+
 }

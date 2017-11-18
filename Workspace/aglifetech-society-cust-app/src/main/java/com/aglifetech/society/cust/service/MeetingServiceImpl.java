@@ -3,6 +3,7 @@ package com.aglifetech.society.cust.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.aglifetech.society.common.TxnCode;
 import com.aglifetech.society.cust.model.LoanEntryBook;
 import com.aglifetech.society.cust.model.LoanMaster;
 import com.aglifetech.society.cust.model.MeetingEntry;
@@ -30,23 +31,23 @@ public class MeetingServiceImpl implements MeetingEntryService {
 	private LoanEntryBookService loanEntryBookService;
 	private MeetingEntryValidator meetingEntryValidator;
 	private LoanEntryBookRepository loanEntryRepo;
-	
+
 	public MeetingServiceImpl() {
 		meetingEntryRepo = new MeetingEntryRepositoryImpl();
 		loanmasterRpo = new LoanMasterRepositoryImpl();
 		socRepo = new SocietyRepositoryImpl();
 		socAcRepo = new SocietyAccountRepositoryImpl();
-		
+
 		loanService = new LoanMasterServiceImpl();
 		loanEntryBookService = new LoanEntryBookServiceImpl();
 		socAcService = new SocietyAccountServiceImpl();
 		meetingEntryValidator = new MeetingEntryValidator();
 		loanEntryRepo = new LoanEntryBookRepositoryImpl();
 	}
-	
+
 	@Override
 	public void addMeeting(MeetingEntry meetingEntry) {
-		
+
 		// 1. Meeting Next Date appropriate set, Post success of meeting entry it should
 		// update account master last_meeting_dt and alert_dttm
 		// 3. Interest rate coming as 0 on first installment
@@ -54,10 +55,10 @@ public class MeetingServiceImpl implements MeetingEntryService {
 		// Get Society
 		SocietyAccount socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
 		Society soc = socAcService.getSocietyByAccountId(meetingEntry.getSocietyMasterId(),
-		        meetingEntry.getSocietyAccountMasterId());
+				meetingEntry.getSocietyAccountMasterId());
 		meetingEntryValidator.validationAllData(meetingEntry, soc.getShareAmount());
 		meetingEntryValidator.validateMeeting(meetingEntry, socAc);
-		
+
 		double shareAmt = soc.getShareAmount();
 		double loanDis = meetingEntry.getLoanDisbursedAmount();
 		double paidAmt = meetingEntry.getTotalPaidAmount();
@@ -68,11 +69,11 @@ public class MeetingServiceImpl implements MeetingEntryService {
 		// update to db
 		// meeting date...
 		socAcService.updateMeetingDate(socAc, meetingEntry.getMeetingDate());
-		
+
 		// Perform Loan installment & Interest charging
 		loanService.performInstallments(meetingEntry.getSocietyAccountMasterId(), installMentAmt,
-		        meetingEntry.getMeetingDate());
-		
+				meetingEntry.getMeetingDate());
+
 		// Add Loan
 		if (loanDis > 0) {
 			LoanMaster loanMaster = new LoanMaster();
@@ -83,31 +84,31 @@ public class MeetingServiceImpl implements MeetingEntryService {
 			loanMaster.setTotalIntrestPaid(0);
 			loanMaster.setDisbursementDate(meetingEntry.getMeetingDate());
 			loanmasterRpo.addLoanDetail(loanMaster);
-			
+
 			loanEntryBookService.addLoanEntryBookDetail(loanMaster.getId(), loanMaster.getLoanDisbusmentAmount(),
-			        "LN_DISBUS", loanMaster.getDisbursementDate());
+					TxnCode.LN_DISBUS, loanMaster.getDisbursementDate());
 		}
 	}
-	
+
 	@Override
 	public void deleteLastMeeting(MeetingEntry meetingEntry) {
 		SocietyAccount socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
 		meetingEntryValidator.validateLastMeeting(meetingEntry, socAc);
 		List<LoanEntryBook> loanEntryDtl = loanEntryRepo.findLoanEntryDetailsByMeetingDate(
-		        meetingEntry.getSocietyAccountMasterId(), socAc.getLastMeetingDate());
-		
+				meetingEntry.getSocietyAccountMasterId(), socAc.getLastMeetingDate());
+
 		for (LoanEntryBook loanBookDtl : loanEntryDtl) {
 			String txnCode = loanBookDtl.getTractionCode();
 			LoanMaster loanMaster = loanmasterRpo.findLoanDetailByLoanMasterId(loanBookDtl.getLoanMasterId());
-			//Below is to make loan active if Loan was closed on Last Meeting
+			// Below is to make loan active if Loan was closed on Last Meeting
 			double pendingLoan = loanMaster.getPendingPrincipleLoan();
 			if (pendingLoan == 0) {
 				loanMaster.setAccountStatus(1);
 				loanMaster.setCloseDate(null);
 			}
 			double intAmount = loanMaster.getTotalIntrestPaid();
-			//LoanDisbus=1000 > Delete loanMaster and LoanEntryBook 
-			if (txnCode.equals("INT_CHRG")) {
+			// LoanDisbus=1000 > Delete loanMaster and LoanEntryBook
+			if (txnCode.equals(TxnCode.INT_CHRG)) {
 				double interestCharge = loanBookDtl.getTxnAmt();
 				pendingLoan = pendingLoan - interestCharge;
 				double remainingInt = intAmount - interestCharge;
@@ -115,21 +116,25 @@ public class MeetingServiceImpl implements MeetingEntryService {
 				loanMaster.setPendingPrincipleLoan(pendingLoan);
 				loanmasterRpo.updateDetail(loanMaster);
 				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
-				
-			} else if (txnCode.equals("INST_PAID")) {
+
+			} else if (txnCode.equals(TxnCode.INST_PAID)) {
 				double installmentPaid = loanBookDtl.getTxnAmt();
 				pendingLoan = pendingLoan + installmentPaid;
 				loanMaster.setPendingPrincipleLoan(pendingLoan);
 				loanmasterRpo.updateDetail(loanMaster);
 				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
-			} else if (txnCode.equals("LN_DISBUS")) {
+			} else if (txnCode.equals(TxnCode.LN_DISBUS)) {
 				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
 				loanmasterRpo.deleteLoanMasterDtl(loanMaster);
+			} else if (txnCode.equals(TxnCode.LN_CLOSED)) {
+				loanEntryRepo.deleteLoanEntryDetail(loanBookDtl);
 			}
 			meetingEntryRepo.deleteMeeting(meetingEntry);
+
 		}
-		 LocalDate LastMeetingDate = meetingEntryRepo.findLastMeetingDate(socAc.getid());
-		 socAcService.updateMeetingDate(socAc,LastMeetingDate);
+		// meetingEntryRepo.deleteMeeting(meetingEntry);
+		LocalDate LastMeetingDate = meetingEntryRepo.findLastMeetingDate(socAc.getid());
+		socAcService.updateMeetingDate(socAc, LastMeetingDate);
 	}
-	
+
 }
