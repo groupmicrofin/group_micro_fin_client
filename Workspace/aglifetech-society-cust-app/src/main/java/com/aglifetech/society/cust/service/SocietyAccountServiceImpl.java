@@ -3,13 +3,9 @@ package com.aglifetech.society.cust.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
-import com.aglifetech.society.cust.model.MeetingEntry;
 import com.aglifetech.society.cust.model.Society;
 import com.aglifetech.society.cust.model.SocietyAccount;
-import com.aglifetech.society.cust.repository.MeetingEntryRepository;
-import com.aglifetech.society.cust.repository.MeetingEntryRepositoryImpl;
 import com.aglifetech.society.cust.repository.SocietyAccountRepository;
 import com.aglifetech.society.cust.repository.SocietyAccountRepositoryImpl;
 import com.aglifetech.society.cust.repository.SocietyRepository;
@@ -22,14 +18,12 @@ public class SocietyAccountServiceImpl implements SocietyAccountService {
 	SocietyAccountRepository socAcRepo;
 	SocietyRepository socRepo;
 	SocietyAccountValidator socAcValidator;
-	MeetingEntryRepository meetingRepo;
-	MeetingEntryService meetService;
 
 	public SocietyAccountServiceImpl() {
 		socAcRepo = new SocietyAccountRepositoryImpl();
 		socRepo = new SocietyRepositoryImpl();
 		socAcValidator = new SocietyAccountValidator();
-		meetingRepo = new MeetingEntryRepositoryImpl();
+
 	}
 
 	@Override
@@ -71,14 +65,4 @@ public class SocietyAccountServiceImpl implements SocietyAccountService {
 		return society;
 	}
 
-	@Override
-	public void deleteSocietyAccount(SocietyAccount societyaccount) {
-
-		List<MeetingEntry> meetings = meetingRepo.findAllMeetingsByAccountMasterId(societyaccount.getid());
-
-		for (MeetingEntry meetingEntry : meetings) {
-
-		}
-
-	}
 }

@@ -20,7 +20,7 @@ public class SocietyClientAppSeedFactory {
 		sc.setSocietyStartDate(localDate);
 		sc.setShareAmount(100);
 		sc.setIntrestRate(12);
-		sc.setScheduleFrequency("0 0 0 ? * 0L *");
+		sc.setScheduleFrequency("0 0 0 ? * 1#2 *");
 		return sc;
 	}
 

@@ -3,9 +3,12 @@ package com.aglifetech.society.cust.integration;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.aglifetech.society.cust.model.LoanMaster;
@@ -27,6 +30,7 @@ import com.aglifetech.society.cust.service.SocietyDashBoardService;
 import com.aglifetech.society.cust.service.SocietyDashBoardServiceImpl;
 import com.aglifetech.society.cust.service.SocietyService;
 import com.aglifetech.society.cust.service.SocietyServiceImpl;
+import com.aglifetech.society.cust.util.CalculatorUtil;
 import com.aglifetech.society.seed.SocietyClientAppSeedFactory;
 
 public class MeetingEntryTestWithDeleteInstallment {
@@ -112,7 +116,7 @@ public class MeetingEntryTestWithDeleteInstallment {
 
 		assertTrue(socAcReport.getPendingPrincipleLoanAmount() == 710);
 		assertTrue(socAcReport.getAmountNeedToCloseAllLoan() == 717.1);
-		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 12, 24)));
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 12, 31)));
 		// 3.7
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
 		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 2000, 400,
@@ -125,7 +129,7 @@ public class MeetingEntryTestWithDeleteInstallment {
 
 		assertTrue(socAcReport.getPendingPrincipleLoanAmount() == 2417.1);
 		assertTrue(socAcReport.getAmountNeedToCloseAllLoan() == 2441.2709999999997);
-		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 1, 21)));
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2018, 1, 28)));
 
 		// 3.9
 		socAc = socAcRepo.findSocietyAccountById(socAc.getid());
@@ -139,20 +143,102 @@ public class MeetingEntryTestWithDeleteInstallment {
 		assertTrue(socAcReport.getTotalNoOfMeetings() == 13);
 		assertTrue(socAcReport.getTotalShareAmount() == 1300);
 
-		assertTrue(socAcReport.getPendingPrincipleLoanAmount() == 1741.27);
-		assertTrue(socAcReport.getAmountNeedToCloseAllLoan() == 1758.68);
-		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 02, 25)));
-		meetingService.deleteLastMeeting(meetingEntry);
-		meetingEntry.setMeetingDate(LocalDate.of(2017, 12, 31));
-		meetingService.deleteLastMeeting(meetingEntry);
-		meetingEntry.setMeetingDate(LocalDate.of(2017, 11, 30));
-		meetingService.deleteLastMeeting(meetingEntry);
-		meetingEntry.setMeetingDate(LocalDate.of(2017, 10, 31));
-		meetingService.deleteLastMeeting(meetingEntry);
-		/*
-		 * meetingEntry.setMeetingDate(LocalDate.of(2017,9,30));
-		 * meetingService.deleteLastMeeting(meetingEntry);
-		 */
+		assertTrue(socAcReport.getPendingPrincipleLoanAmount() == 1741.271);
+		assertTrue(CalculatorUtil.round(socAcReport.getAmountNeedToCloseAllLoan(), 2) == 1758.68);
+
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2018, 02, 25)));
+		deleteMeetingTest(meetingEntry);
+
+		meetingEntry = SocietyClientAppSeedFactory.getMeetingEntryDtl(society.getId(), socAc.getid(), 1000, 100,
+				LocalDate.of(2018, 01, 31));
+		meetingService.addMeeting(meetingEntry);
+		// Report validation
+		socAcReport = socDashService.getDashBoard(socAc.getid());
+		System.out.println("3.10:-" + socAcReport.toString());
+
+		assertTrue(socAcReport.getTotalNoOfMeetings() == 13);
+		assertTrue(socAcReport.getTotalShareAmount() == 1300);
+		assertTrue(socAcReport.getTotalLoanAmount() == 1000);
+		assertTrue(socAcReport.getPendingPrincipleLoanAmount() == 1000);
+		assertTrue(socAcReport.getAmountNeedToCloseAllLoan() == 1010);
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2018, 02, 25)));
+
 	}
 
+	@Ignore
+	public void deleteMeetingTest(MeetingEntry meetingEntry) {
+
+		// To check for validating meeting date on delete
+		boolean flag = false;
+		try {
+			meetingEntry.setMeetingDate(LocalDate.of(2018, 2, 21));
+			meetingService.deleteLastMeeting(meetingEntry);
+		} catch (RuntimeException rte) {
+			String exMessage = rte.getMessage();
+			System.out.println(exMessage);
+			int indx = exMessage.indexOf("This is not Last Meeting");
+			if (indx >= 0) {
+				flag = true;
+			}
+		}
+		assertTrue(flag);
+		// Assert for exception
+
+		// Last meeting date 31/01/2018
+		meetingEntry.setMeetingDate(LocalDate.of(2018, 01, 31));
+		meetingService.deleteLastMeeting(meetingEntry);
+		SocietyAccount socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
+		assertTrue(socAc.getLastMeetingDate().equals(LocalDate.of(2017, 12, 31)));
+		assertTrue(socAc.getAlertDatetime()
+				.equals(LocalDateTime.of(LocalDate.of(2018, 01, 27), LocalTime.of(11, 00, 00))));
+		SocietyAccountReport socAcReport = socDashService.getDashBoard(socAc.getid());
+		System.out.println("3.9:-" + socAcReport.toString());
+		assertTrue(socAcReport.getTotalNoOfMeetings() == 12);
+		assertTrue(socAcReport.getTotalShareAmount() == 1200);
+
+		assertTrue(CalculatorUtil.round(socAcReport.getPendingPrincipleLoanAmount(), 2) == 2417.10);
+		assertTrue(CalculatorUtil.round(socAcReport.getAmountNeedToCloseAllLoan(), 2) == 2441.27);
+
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2018, 01, 28)));
+
+		// Last meeting date 31/12/2017
+		meetingEntry.setMeetingDate(LocalDate.of(2017, 12, 31));
+		meetingService.deleteLastMeeting(meetingEntry);
+		socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
+		assertTrue(socAc.getLastMeetingDate().equals(LocalDate.of(2017, 11, 30)));
+		assertTrue(socAc.getAlertDatetime()
+				.equals(LocalDateTime.of(LocalDate.of(2017, 12, 30), LocalTime.of(11, 00, 00))));
+		socAcReport = socDashService.getDashBoard(socAc.getid());
+		System.out.println("3.9:-" + socAcReport.toString());
+		assertTrue(socAcReport.getTotalNoOfMeetings() == 11);
+		assertTrue(socAcReport.getTotalShareAmount() == 1100);
+		assertTrue(CalculatorUtil.round(socAcReport.getPendingPrincipleLoanAmount(), 2) == 710.00);
+		assertTrue(CalculatorUtil.round(socAcReport.getAmountNeedToCloseAllLoan(), 2) == 717.10);
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 12, 31)));
+
+		// Last Meeting Date 30/11/2017
+		meetingEntry.setMeetingDate(LocalDate.of(2017, 11, 30));
+		meetingService.deleteLastMeeting(meetingEntry);
+		socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
+		assertTrue(socAc.getLastMeetingDate().equals(LocalDate.of(2017, 10, 31)));
+		assertTrue(socAc.getAlertDatetime()
+				.equals(LocalDateTime.of(LocalDate.of(2017, 11, 25), LocalTime.of(11, 00, 00))));
+		socAcReport = socDashService.getDashBoard(socAc.getid());
+		System.out.println("3.9:-" + socAcReport.toString());
+		assertTrue(socAcReport.getTotalNoOfMeetings() == 10);
+		assertTrue(socAcReport.getTotalShareAmount() == 1000);
+		assertTrue(CalculatorUtil.round(socAcReport.getPendingPrincipleLoanAmount(), 2) == 1000.00);
+		assertTrue(CalculatorUtil.round(socAcReport.getAmountNeedToCloseAllLoan(), 2) == 1010.00);
+		assertTrue(socAcReport.getNextMeetingDate().equals(LocalDate.of(2017, 11, 26)));
+
+		// Last Meeting Date 31/10/2017
+		meetingEntry.setMeetingDate(LocalDate.of(2017, 10, 31));
+		meetingService.deleteLastMeeting(meetingEntry);
+		socAc = socAcRepo.findSocietyAccountById(meetingEntry.getSocietyAccountMasterId());
+		assertTrue(socAc.getLastMeetingDate() == null);
+		assertTrue(socAc.getAlertDatetime() == null);
+
+		// socAcReport = socDashService.getDashBoard(socAc.getid());
+
+	}
 }

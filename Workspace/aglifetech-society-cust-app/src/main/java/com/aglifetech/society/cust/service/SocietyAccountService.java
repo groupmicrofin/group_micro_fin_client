@@ -15,6 +15,4 @@ public interface SocietyAccountService {
 
 	public Society getSocietyByAccountId(Long societyMaster, Long accountMasterId);
 
-	public void deleteSocietyAccount(SocietyAccount societyaccount);
-
 }
